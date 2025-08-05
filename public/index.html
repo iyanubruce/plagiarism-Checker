@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Research Assistant</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #2c3e50;
+      }
+      textarea {
+        width: 100%;
+        height: 150px;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+      button {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+      }
+      button:hover {
+        background: #2980b9;
+      }
+      input[type="text"],
+      input[type="file"] {
+        margin-bottom: 15px;
+        padding: 8px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      #results,
+      #recommendations {
+        margin-top: 30px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        background: #f9f9f9;
+      }
+      .match {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        background: white;
+      }
+      .paper-title {
+        font-weight: bold;
+        color: #2980b9;
+        margin-bottom: 8px;
+      }
+      .similarity {
+        background-color: #e8f5e9;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: bold;
+        float: right;
+      }
+      .citation {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .copy-btn {
+        background: #e0e0e0;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-top: 5px;
+        font-size: 14px;
+      }
+      .copy-btn:hover {
+        background: #d0d0d0;
+      }
+      .section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+      .citation-controls {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Research Assistant</h1>
+
+    <div class="section">
+      <h2>Add Paper to Database</h2>
+      <input type="file" id="addFile" accept=".pdf,.docx" />
+      <input
+        type="text"
+        id="addTitle"
+        placeholder="Paper title"
+        style="width: 100%"
+      />
+
+      <div
+        style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px"
+      >
+        <input
+          type="text"
+          id="addAuthors"
+          placeholder='Authors (e.g., ["Smith, John", "Doe, Jane"])'
+        />
+        <input type="number" id="addYear" placeholder="Year" />
+        <input type="text" id="addSource" placeholder="Journal/Conference" />
+        <input type="text" id="addDoi" placeholder="DOI" />
+      </div>
+
+      <button onclick="addPaper()">Add Paper</button>
+    </div>
+    <div class="section">
+      <h2>Citation Tools</h2>
+
+      <div style="margin-bottom: 15px">
+        <input
+          type="text"
+          id="citationPaperId"
+          placeholder="Paper ID (e.g., 1719283746123)"
+        />
+        <select id="citationStyleSelect">
+          <option value="apa">APA Style</option>
+          <option value="ieee">IEEE Style</option>
+        </select>
+        <button onclick="getCitation()">Get Citation</button>
+      </div>
+
+      <div style="margin-bottom: 15px">
+        <h4>Convert Citation Style</h4>
+        <textarea
+          id="convertCitationInput"
+          placeholder="Paste citation to convert..."
+          style="height: 80px"
+        ></textarea>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+          "
+        >
+          <select id="fromStyle">
+            <option value="apa">From: APA</option>
+            <option value="ieee">From: IEEE</option>
+          </select>
+          <select id="toStyle">
+            <option value="ieee">To: IEEE</option>
+            <option value="apa">To: APA</option>
+          </select>
+        </div>
+        <button onclick="convertCitation()" style="margin-top: 10px">
+          Convert
+        </button>
+      </div>
+
+      <div id="citationResults"></div>
+    </div>
+    <div class="section">
+      <h2>Check for Plagiarism</h2>
+      <textarea
+        id="checkText"
+        placeholder="Paste your text here to check for plagiarism..."
+      ></textarea>
+      <button onclick="checkPlagiarism()">Check Plagiarism</button>
+
+      <div id="results"></div>
+    </div>
+
+    <div class="section">
+      <h2>Find Related Papers</h2>
+      <textarea
+        id="recommendText"
+        placeholder="Paste your research text or topic to find related papers..."
+      ></textarea>
+
+      <div class="citation-controls">
+        <label>
+          <input type="radio" name="citationStyle" value="apa" checked /> APA
+          Style
+        </label>
+        <label style="margin-left: 15px">
+          <input type="radio" name="citationStyle" value="ieee" /> IEEE Style
+        </label>
+      </div>
+
+      <button onclick="getRecommendations()">Find Related Papers</button>
+
+      <div id="recommendations"></div>
+    </div>
+
+    <script>
+      async function addPaper() {
+        const fileInput = document.getElementById("addFile");
+        const titleInput = document.getElementById("addTitle");
+        const authorsInput = document.getElementById("addAuthors");
+        const yearInput = document.getElementById("addYear");
+        const sourceInput = document.getElementById("addSource");
+        const doiInput = document.getElementById("addDoi");
+
+        const file = fileInput.files[0];
+        const title = titleInput.value.trim();
+
+        if (!file || !title) {
+          alert("Please select a file and enter a title");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("paper", file);
+        formData.append("title", title);
+
+        // Add optional metadata
+        if (authorsInput.value.trim()) {
+          formData.append("authors", authorsInput.value.trim());
+        }
+        if (yearInput.value.trim()) {
+          formData.append("year", yearInput.value.trim());
+        }
+        if (sourceInput.value.trim()) {
+          formData.append("source", sourceInput.value.trim());
+        }
+        if (doiInput.value.trim()) {
+          formData.append("doi", doiInput.value.trim());
+        }
+
+        try {
+          const res = await fetch("http://localhost:5000/api/add-paper", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+          if (data.error) {
+            alert("Error: " + data.error);
+          } else {
+            alert(
+              `Paper added successfully! ID: ${data.id} (${data.chunksAdded} chunks)`
+            );
+            fileInput.value = "";
+            titleInput.value = "";
+            authorsInput.value = "";
+            yearInput.value = "";
+            sourceInput.value = "";
+            doiInput.value = "";
+          }
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+      }
+
+      async function checkPlagiarism() {
+        const text = document.getElementById("checkText").value.trim();
+        const resultsDiv = document.getElementById("results");
+
+        if (!text) {
+          resultsDiv.innerHTML =
+            '<p style="color:red">Please enter text to check</p>';
+          return;
+        }
+
+        try {
+          resultsDiv.innerHTML = "<p>Checking for plagiarism...</p>";
+
+          const res = await fetch(
+            "http://localhost:5000/api/check-plagiarism",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text }),
+            }
+          );
+
+          const data = await res.json();
+
+          if (data.error) {
+            resultsDiv.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+            return;
+          }
+
+          let html = `
+          <h3>Results</h3>
+          <p><strong>Text Length:</strong> ${data.textLength} words</p>
+          <p><strong>Chunks Analyzed:</strong> ${data.chunksAnalyzed}</p>
+          <p><strong>Overall Similarity:</strong> <span class="similarity">${data.similarityScore}%</span></p>
+          <p><strong>Total Matches Found:</strong> ${data.matchesFound}</p>
+        `;
+
+          if (data.matchesFound > 0) {
+            html += "<h4>Detailed Matches:</h4>";
+
+            for (const paper of data.detailedMatches) {
+              html += `
+              <div class="match">
+                <div class="paper-title">${paper.title} (${paper.maxSimilarity}% match)</div>
+            `;
+
+              for (const match of paper.matches) {
+                html += `
+                <div style="margin: 10px 0; padding: 5px; background: #f5f5f5;">
+                  <div><strong>Query:</strong> ${escapeHtml(
+                    match.querySnippet
+                  )}</div>
+                  <div><strong>Database:</strong> ${escapeHtml(
+                    match.databaseSnippet
+                  )}</div>
+                  <div>Similarity: <span class="similarity">${
+                    match.similarity
+                  }%</span></div>
+                </div>
+              `;
+              }
+
+              html += "</div>";
+            }
+          } else {
+            html += "<p>No significant matches found.</p>";
+          }
+
+          resultsDiv.innerHTML = html;
+        } catch (err) {
+          resultsDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+        }
+      }
+
+      async function getRecommendations() {
+        const text = document.getElementById("recommendText").value.trim();
+        const style = document.querySelector(
+          'input[name="citationStyle"]:checked'
+        ).value;
+        const resultsDiv = document.getElementById("recommendations");
+
+        if (!text) {
+          resultsDiv.innerHTML =
+            '<p style="color:red">Please enter text to analyze</p>';
+          return;
+        }
+
+        resultsDiv.innerHTML = "<p>Finding related papers...</p>";
+
+        try {
+          const res = await fetch("http://localhost:5000/api/recommend", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+          });
+
+          const data = await res.json();
+
+          if (!data.results || data.results.length === 0) {
+            resultsDiv.innerHTML =
+              "<p>No relevant papers found. Try different keywords or check your database.</p>";
+            return;
+          }
+
+          let html = "<h3>Recommended Papers</h3>";
+
+          data.results.forEach((paper, i) => {
+            const citation =
+              style === "apa" ? paper.citation.apa : paper.citation.ieee;
+
+            html += `
+            <div class="match">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4>${i + 1}. ${escapeHtml(paper.title)}</h4>
+                <span class="similarity">${paper.relevance}% relevant</span>
+              </div>
+              <p><em>${escapeHtml(paper.sampleText)}</em></p>
+              <div class="citation">
+                ${escapeHtml(citation)}
+              </div>
+              <button onclick="copyCitation('${escapeHtml(
+                citation
+              )}')" class="copy-btn">
+                Copy Citation
+              </button>
+            </div>
+          `;
+          });
+
+          resultsDiv.innerHTML = html;
+        } catch (err) {
+          resultsDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+        }
+      }
+
+      function escapeHtml(unsafe) {
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "<")
+          .replace(/>/g, ">")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function copyCitation(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert("Citation copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+            alert("Failed to copy citation");
+          });
+      }
+      async function getCitation() {
+        const paperId = document.getElementById("citationPaperId").value.trim();
+        const style = document.getElementById("citationStyleSelect").value;
+        const resultsDiv = document.getElementById("citationResults");
+
+        if (!paperId) {
+          resultsDiv.innerHTML =
+            '<p style="color:red">Please enter a paper ID</p>';
+          return;
+        }
+
+        resultsDiv.innerHTML = "<p>Generating citation...</p>";
+
+        try {
+          const res = await fetch(
+            `http://localhost:5000/api/citation/${paperId}?style=${style}`,
+            {
+              method: "GET",
+            }
+          );
+
+          const data = await res.json();
+
+          if (data.error) {
+            resultsDiv.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+            return;
+          }
+
+          resultsDiv.innerHTML = `
+      <div class="match">
+        <h4>Citation for Paper ${paperId}</h4>
+        <div class="citation">
+          ${escapeHtml(data.citation.formatted)}
+        </div>
+        <button onclick="copyCitation('${escapeHtml(
+          data.citation.formatted
+        )}')" class="copy-btn">
+          Copy Citation
+        </button>
+      </div>
+    `;
+        } catch (err) {
+          resultsDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+        }
+      }
+
+      async function convertCitation() {
+        const citation = document
+          .getElementById("convertCitationInput")
+          .value.trim();
+        const fromStyle = document.getElementById("fromStyle").value;
+        const toStyle = document.getElementById("toStyle").value;
+        const resultsDiv = document.getElementById("citationResults");
+
+        if (!citation) {
+          resultsDiv.innerHTML =
+            '<p style="color:red">Please enter a citation to convert</p>';
+          return;
+        }
+
+        resultsDiv.innerHTML = "<p>Converting citation...</p>";
+
+        try {
+          const res = await fetch(
+            "http://localhost:5000/api/citation/convert",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                citation,
+                fromStyle,
+                toStyle,
+              }),
+            }
+          );
+
+          const data = await res.json();
+
+          if (data.error) {
+            resultsDiv.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+            return;
+          }
+
+          resultsDiv.innerHTML = `
+      <div class="match">
+        <h4>Converted Citation</h4>
+        <div>
+          <strong>Original (${fromStyle.toUpperCase()}):</strong>
+          <div class="citation">${escapeHtml(data.original.citation)}</div>
+        </div>
+        <div>
+          <strong>Converted (${toStyle.toUpperCase()}):</strong>
+          <div class="citation">${escapeHtml(data.converted.citation)}</div>
+        </div>
+        <button onclick="copyCitation('${escapeHtml(
+          data.converted.citation
+        )}')" class="copy-btn">
+          Copy Converted Citation
+        </button>
+      </div>
+    `;
+        } catch (err) {
+          resultsDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+        }
+      }
+    </script>
+  </body>
+</html>
