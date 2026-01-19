@@ -1,29 +1,47 @@
-import express from "express";
-import cors from "cors";
-import path from "path";
-import plagiarismRouter from "./routes/plagiarism.routes";
-import recommendRouter from "./routes/recommend.routes";
-import citationRouter from "./routes/citation.routes"; // Add this import
+import app from "./app";
+import http from "http";
+import env from "./config/env";
+import logger from "./utils/logger";
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = env.application.port;
+const server = http.createServer(app);
+const HOST = "0.0.0.0";
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use("/uploads", express.static("uploads"));
-app.use("/public", express.static("public"));
+const startServer = async () => {
+  try {
+    server.listen(PORT, () => {
+      logger.info(
+        `🚀 Research Assistant API running on http://localhost:${PORT}`,
+      );
+      logger.info(`📡 Environment: ${env.application.env}`);
+    });
+  } catch (err) {
+    logger.error(`💀 Fatal: Failed to start server due to error ${err}`);
+    process.exit(1);
+  }
+};
 
-// Routes
-app.use("/api", plagiarismRouter);
-app.use("/api", recommendRouter);
-app.use("/api", citationRouter); // Add this line
+server.on("error", (error: NodeJS.ErrnoException) => {
+  if (error.syscall !== "listen") throw error;
 
-// Serve frontend
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+  const bind = typeof PORT === "string" ? `Pipe ${PORT}` : `Port ${PORT}`;
+  switch (error.code) {
+    case "EACCES":
+      logger.error(`${bind} requires elevated privileges`);
+      process.exit(1);
+    case "EADDRINUSE":
+      logger.error(`${bind} is already in use`);
+      process.exit(1);
+    default:
+      throw error;
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Research Assistant API running on http://localhost:${PORT}`);
+process.on("SIGTERM", () => {
+  server.close(() => {
+    logger.info("🔌 Server closed");
+    process.exit(0);
+  });
 });
+
+startServer();

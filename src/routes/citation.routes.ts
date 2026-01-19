@@ -3,7 +3,12 @@ import {
   getCitation,
   convertCitation,
   getSupportedStyles,
-} from "../controllers/citation.controller";
+} from "../handlers/citation";
+import { validate } from "../middlewares/validate";
+import {
+  getCitationSchema,
+  convertCitationSchema,
+} from "../validations/citation";
 
 const router = Router();
 
@@ -11,9 +16,13 @@ const router = Router();
 router.get("/citation/styles", getSupportedStyles); // This must come before parameterized routes
 
 // PARAMETERIZED routes AFTER
-router.get("/citation/:id", getCitation);
+router.get("/citation/:id", validate(getCitationSchema), getCitation);
 
 // Other routes
-router.post("/citation/convert", convertCitation);
+router.post(
+  "/citation/convert",
+  validate(convertCitationSchema),
+  convertCitation,
+);
 
 export default router;

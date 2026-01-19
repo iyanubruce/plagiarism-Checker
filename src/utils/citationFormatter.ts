@@ -2,9 +2,8 @@ import { PaperChunk } from "../types";
 
 export function formatCitation(
   chunk: PaperChunk,
-  style: "apa" | "ieee" = "apa"
+  style: "apa" | "ieee" = "apa",
 ): string {
-  // Fallback to title if no authors
   const authors =
     chunk.authors && chunk.authors.length > 0
       ? chunk.authors

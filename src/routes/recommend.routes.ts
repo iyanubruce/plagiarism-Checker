@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { recommendPapers } from "../controllers/recommend.controller";
+import { recommendPapers } from "../handlers/recommend";
+import { validate } from "../middlewares/validate";
+import { recommendPapersSchema } from "../validations/recommended";
 
 const router = Router();
 
-router.post("/recommend", recommendPapers);
+router.post("/", validate(recommendPapersSchema), recommendPapers);
 
 export default router;
