@@ -253,10 +253,11 @@
             body: formData,
           });
 
-          const data = await res.json();
-          if (data.error) {
-            alert("Error: " + data.error);
+          const response = await res.json();
+          if (response.status === false || response.data?.error) {
+            alert("Error: " + (response.data?.error || response.message));
           } else {
+            const data = response.data;
             alert(
               `Paper added successfully! ID: ${data.id} (${data.chunksAdded} chunks)`,
             );
@@ -294,10 +295,11 @@
             },
           );
 
-          const data = await res.json();
+          const response = await res.json();
+          const data = response.data;
 
-          if (data.error) {
-            resultsDiv.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+          if (!response.status || data.error) {
+            resultsDiv.innerHTML = `<p style="color:red">Error: ${data?.error || response.message}</p>`;
             return;
           }
 
@@ -368,7 +370,8 @@
             body: JSON.stringify({ text }),
           });
 
-          const data = await res.json();
+          const response = await res.json();
+          const data = response.data;
 
           if (!data.results || data.results.length === 0) {
             resultsDiv.innerHTML =
@@ -448,10 +451,11 @@
             },
           );
 
-          const data = await res.json();
+          const response = await res.json();
+          const data = response.data;
 
-          if (data.error) {
-            resultsDiv.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+          if (!response.status || data.error) {
+            resultsDiv.innerHTML = `<p style="color:red">Error: ${data?.error || response.message}</p>`;
             return;
           }
 
@@ -503,10 +507,11 @@
             },
           );
 
-          const data = await res.json();
+          const response = await res.json();
+          const data = response.data;
 
-          if (data.error) {
-            resultsDiv.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+          if (!response.status || data.error) {
+            resultsDiv.innerHTML = `<p style="color:red">Error: ${data?.error || response.message}</p>`;
             return;
           }
 

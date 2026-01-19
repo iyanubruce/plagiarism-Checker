@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "path";
 import morgan from "morgan";
 import compression from "compression";
-import v1Routes from "./routes/index.routes";
+import v1Routes from "./api/routes/index.routes";
 import config from "./config/env";
 
 const app = express();

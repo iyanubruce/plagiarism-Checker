@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
-import { recommendPapersController } from "../controllers/recommend.controller";
-import { itemResponse } from "../helpers/utilities";
+import { recommendPapersController } from "../../controllers/recommend.controller";
+import { itemResponse } from "../../helpers/utilities";
 import {
   RecommendPapersInput,
   RecommendPapersResponse,
   RecommendPapersErrorResponse,
-} from "../validations/recommended";
+} from "../../validations/recommended";
 
 export const recommendPapers: RequestHandler<
   {},

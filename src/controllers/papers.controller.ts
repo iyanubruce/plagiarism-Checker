@@ -4,6 +4,7 @@ import { extractText } from "../utils/textExtractor";
 import { preprocess } from "../utils/ngram";
 import { PaperDatabase } from "../database/PaperDatabase";
 import { AddPaperRequestBody } from "../validations/papers";
+import BadRequestError from "../errors/badRequestError";
 
 const db = new PaperDatabase();
 
@@ -17,14 +18,14 @@ export const addPaperController = async (input: AddPaperInput) => {
   const { title, authors, year, source, doi } = body;
 
   if (!file) {
-    throw new Error("No file uploaded");
+    throw new BadRequestError("No file uploaded");
   }
 
   const originalname = file.originalname;
   const ext = path.extname(originalname).toLowerCase();
 
   if (ext !== ".pdf" && ext !== ".docx") {
-    throw new Error("Only PDF and DOCX files are supported");
+    throw new BadRequestError("Only PDF and DOCX files are supported");
   }
 
   const buffer = fs.readFileSync(file.path);
@@ -32,7 +33,7 @@ export const addPaperController = async (input: AddPaperInput) => {
   const cleanedText = preprocess(rawText);
 
   if (cleanedText.length < 100) {
-    throw new Error("Document contains too little text to analyze");
+    throw new BadRequestError("Document contains too little text to analyze");
   }
 
   // Get optional metadata from request

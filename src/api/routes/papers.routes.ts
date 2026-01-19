@@ -4,7 +4,8 @@ import multer from "multer";
 import path from "path";
 import { addPaper } from "../handlers/papers";
 import { validate } from "../middlewares/validate";
-import { addPaperSchema } from "../validations/papers";
+import { addPaperSchema } from "../../validations/papers";
+import BadRequestError from "../../errors/badRequestError";
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -28,7 +29,7 @@ const fileFilter = (
   if (ext === ".pdf" || ext === ".docx") {
     cb(null, true);
   } else {
-    cb(new Error("Only PDF and DOCX files are allowed"));
+    cb(new BadRequestError("Only PDF and DOCX files are allowed"));
   }
 };
 

@@ -3,8 +3,8 @@ import {
   getCitationController,
   convertCitationController,
   getSupportedStylesController,
-} from "../controllers/citation.controller";
-import * as utilities from "../helpers/utilities";
+} from "../../controllers/citation.controller";
+import * as utilities from "../../helpers/utilities";
 import {
   GetCitationParams,
   GetCitationQuery,
@@ -13,7 +13,7 @@ import {
   ConvertCitationResponse,
   SupportedStylesResponse,
   CitationErrorResponse,
-} from "../validations/citation";
+} from "../../validations/citation";
 
 export const getCitation: RequestHandler<
   GetCitationParams,

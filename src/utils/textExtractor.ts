@@ -1,10 +1,12 @@
 import PdfParse from "pdf-parse";
 import * as mammoth from "mammoth";
 import { Buffer } from "buffer";
+import BadRequestError from "../errors/badRequestError";
+import logger from "./logger";
 
 export async function extractText(
   buffer: Buffer,
-  ext: string
+  ext: string,
 ): Promise<string> {
   try {
     if (ext === ".pdf") {
@@ -14,10 +16,10 @@ export async function extractText(
       const result = await mammoth.extractRawText({ buffer });
       return result.value.trim();
     } else {
-      throw new Error(`Unsupported extension: ${ext}`);
+      throw new BadRequestError(`Unsupported extension: ${ext}`);
     }
   } catch (err: any) {
-    console.error("Extraction error:", err.message);
-    throw new Error(`Text extraction failed: ${err.message}`);
+    logger.error("Extraction error:", err.message);
+    throw new BadRequestError(`Text extraction failed: ${err.message}`);
   }
 }

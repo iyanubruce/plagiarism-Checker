@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
-import { checkPlagiarismController } from "../controllers/plagiarism.controller";
-import { itemResponse } from "../helpers/utilities";
+import { checkPlagiarismController } from "../../controllers/plagiarism.controller";
+import { itemResponse } from "../../helpers/utilities";
 import {
   CheckPlagiarismRequestBody,
   CheckPlagiarismResponse,
   CheckPlagiarismErrorResponse,
-} from "../validations/plagiarism";
+} from "../../validations/plagiarism";
 
 export const checkPlagiarism: RequestHandler<
   {},

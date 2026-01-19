@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { checkPlagiarism } from "../handlers/plagiarism";
 import { validate } from "../middlewares/validate";
-import { checkPlagiarismSchema } from "../validations/plagiarism";
+import { checkPlagiarismSchema } from "../../validations/plagiarism";
 const router = Router();
 
 router.post("/", validate(checkPlagiarismSchema), checkPlagiarism);

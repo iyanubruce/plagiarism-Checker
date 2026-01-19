@@ -8,7 +8,7 @@ import { validate } from "../middlewares/validate";
 import {
   getCitationSchema,
   convertCitationSchema,
-} from "../validations/citation";
+} from "../../validations/citation";
 
 const router = Router();
 

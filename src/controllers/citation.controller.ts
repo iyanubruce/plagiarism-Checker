@@ -6,6 +6,7 @@ import {
   GetCitationQuery,
   ConvertCitationInput,
 } from "../validations/citation";
+import BadRequestError from "../errors/badRequestError";
 
 const db = new PaperDatabase();
 
@@ -18,7 +19,7 @@ export const getCitationController = async (data: {
   const chunks = db.getChunksForPaper(paperId);
 
   if (chunks.length === 0) {
-    throw new Error("Paper not found");
+    throw new BadRequestError("Paper not found");
   }
 
   const chunk = chunks[0]; // First chunk has the metadata
