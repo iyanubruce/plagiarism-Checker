@@ -2,23 +2,23 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
-import { addPaper } from "../handlers/papers";
-import { validate } from "../middlewares/validate";
-import { addPaperSchema } from "../../validations/papers";
-import BadRequestError from "../../errors/badRequestError";
+import { addPaper } from "../../handlers/admin/papers";
+import { validate } from "../../middlewares/validate";
+import { addPaperSchema } from "../../../validations/admin/papers";
+import BadRequestError from "../../../errors/badRequestError";
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
+
   filename: (req, file, cb) => {
     const suffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, file.fieldname + "-" + suffix + path.extname(file.originalname));
   },
 });
 
-// ✅ Improved file filter: uses file extension
 const fileFilter = (
   req: Express.Request,
   file: Express.Multer.File,

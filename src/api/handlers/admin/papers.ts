@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
-import { addPaperController } from "../../controllers/papers.controller";
-import { itemResponse } from "../../helpers/utilities";
+import { addPaperController } from "../../../controllers/admin/papers.controller";
+import { itemResponse } from "../../../helpers/utilities";
 import {
   AddPaperRequestBody,
   AddPaperResponse,
   AddPaperErrorResponse,
-} from "../../validations/papers";
+} from "../../../validations/admin/papers";
 
 export const addPaper: RequestHandler<
   {},

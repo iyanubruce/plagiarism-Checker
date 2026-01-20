@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import { extractText } from "../utils/textExtractor";
-import { preprocess } from "../utils/ngram";
-import { PaperDatabase } from "../database/PaperDatabase";
-import { AddPaperRequestBody } from "../validations/papers";
-import BadRequestError from "../errors/badRequestError";
+import { extractText } from "../../utils/textExtractor";
+import { preprocess } from "../../utils/ngram";
+import { PaperDatabase } from "../../database/PaperDatabase";
+import { AddPaperRequestBody } from "../../validations/admin/papers";
+import BadRequestError from "../../errors/badRequestError";
 
 const db = new PaperDatabase();
 

@@ -3,7 +3,7 @@ import { Router } from "express";
 import recommend from "./recommend.routes";
 import plagiarism from "./plagiarism.routes";
 import citation from "./citation.routes";
-import paper from "./papers.routes";
+import paper from "./admin/papers.routes";
 const router = Router();
 
 router.use("/recommend", recommend);

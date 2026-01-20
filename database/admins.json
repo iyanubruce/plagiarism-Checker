@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1768916949570",
+    "username": "iyanuoluwa",
+    "email": "iyanuoluwa938@gmail.com",
+    "passwordHash": "$2b$10$vM55epxozeVAMKp5RRetsuowd3mTAsPyeQ.t7EX.teKR54.4Y.UW6",
+    "createdAt": "2026-01-20T13:49:09.570Z",
+    "lastLogin": "2026-01-20T14:01:11.411Z"
+  },
+  {
+    "id": "1768917828721",
+    "username": "tan",
+    "email": "tan@gmail.com",
+    "passwordHash": "$2b$10$gvPc..LifSX7/2Pi9svi0.yrZI2uU40VAmcyzO/UeL9OcWQ1MpgmG",
+    "createdAt": "2026-01-20T14:03:48.721Z"
+  }
+]
